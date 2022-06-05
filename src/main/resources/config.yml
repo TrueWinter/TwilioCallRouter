@@ -1,0 +1,91 @@
+# The port TwilioCallRouter should run on
+port: 8500
+
+# HTTP Basic auth
+auth: true
+username: twilio
+password: callrouter
+
+# The voice that TwilioCallRouter should use. Default is ALICE, available options: https://www.twilio.com/docs/libraries/reference/twilio-java/8.31.0/com/twilio/twiml/voice/Say.Voice.html
+# Please note that Amazon Polly voices do incur a charge from Twilio.
+voice: ALICE
+# The language to use. Has no effect when using Amazon Polly voices. Available options: https://www.twilio.com/docs/libraries/reference/twilio-java/8.31.0/com/twilio/twiml/voice/Say.Language.html
+language: EN_GB
+
+# For incoming calls, where should TwilioCallRouter forward them to
+inbound:
+  timeout: 20
+  # Whether this should be handled using the <Sip> verb
+  sip: true
+  answerOnBridge: true
+  default: 'sip:442079460123@example.sip.twilio.com'
+  # For the numbers specified below, Twilio will be instructed to receive TwiML at the URL. Incoming calls will be in E.164 format.
+  custom_handlers:
+    # Match numbers exactly
+    exact:
+      '+18004444444':
+        url: 'https://demo.twilio.com/welcome/voice/'
+        method: GET
+    # Match numbers starting with
+    prefix:
+      '+1202555':
+        url: 'https://user:pass@demo.twilio.com/welcome/voice/'
+        method: GET
+  # Blocks incoming calls from numbers starting with these prefix
+  block_prefixes:
+    '+449':
+      # You can set a string with a message that will be played before the call ends (responding with <Hangup>)
+      say: 'Calls from premium services are blocked'
+    '+448':
+      # Alternatively, set this to false to end the call immediately (responding with <Reject>)
+      say: false
+  # For these prefixes, send calls to a non-default number
+  routed:
+    '+1':
+      sip: false
+      number: '+17185550123'
+
+# For outgoing calls
+outbound:
+  timeout: 20
+  answerOnBridge: true
+  default: '+442079460123'
+  # If you call a number, but not in the international format (starting with + or 00),
+  # the leading 0 (if it exists) will be dropped and this code will be prepended.
+  default_country_code: '+44'
+  # For the numbers specified below, Twilio will be instructed to receive TwiML at the URL. The number will not be converted into E.164 format.
+  custom_handlers:
+    # Match numbers exactly
+    exact:
+      # In this example, an internal phone number
+      '501':
+        url: 'https://example.com/twilio/call_501.xml'
+        method: GET
+    # Match numbers starting with
+    prefix:
+      '+1202555':
+        url: 'https://user:pass@demo.twilio.com/welcome/voice/'
+        method: GET
+  # Blocks outgoing calls to numbers starting with these prefix.
+  # Please note that only the <Reject> verb (using say: false, or custom TwiML) avoids a call charge.
+  # Other forms of blocking the call will still incur charges per minute according to Twilio's pricing.
+  block_prefixes:
+    '+449':
+      # You can set a string with a message that will be played before the call ends (responding with <Hangup>)
+      say: 'Calls to premium services are blocked'
+    '+448':
+      # Alternatively, set this to false to end the call immediately (responding with <Reject>)
+      say: false
+    '+1800':
+      # Responding with custom TwiML is also possible
+      twiml: |
+        <Response>
+          <Say>Calls to toll-free numbers are restricted from this phone</Say>
+          <Hangup/>
+        </Response>
+  # For these prefixes, call from a non-default number
+  routed:
+    '+1': '+17185550123'
+
+# Do not edit this
+config-version: 1

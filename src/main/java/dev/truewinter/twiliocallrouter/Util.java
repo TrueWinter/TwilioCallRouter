@@ -1,0 +1,59 @@
+package dev.truewinter.twiliocallrouter;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Properties;
+import java.util.regex.Pattern;
+
+public class Util {
+    // https://stackoverflow.com/a/15954821
+    public static Path getInstallPath() {
+        Path relative = Paths.get("");
+        return relative.toAbsolutePath();
+    }
+
+    public static String getVersion() throws IOException {
+        Properties properties = new Properties();
+        properties.load(Util.class.getClassLoader().getResourceAsStream("twiliocallrouter.properties"));
+        return properties.getProperty("version");
+    }
+
+    public static String extractNumberFromSipUrl(String sipUrl) {
+        if (!sipUrl.startsWith("sip:")) {
+            System.out.println("Cannot extract E164 from \"" + sipUrl + "\". Not a SIP URL, skipping.");
+            return sipUrl;
+        }
+
+        // sip:2027621401@example.sip.twilio.com;user=phone -> 2027621401 (US)
+        return sipUrl.replace("sip:", "").split(Pattern.quote("@"))[0];
+    }
+
+    // TODO: This method isn't entirely compatible with toll-free numbers, nor short numbers (such as emergency numbers)
+    public static String extractE164FromSipUrl(String defaultCountryCode, String sipUrl) {
+        if (!sipUrl.startsWith("sip:")) {
+            System.out.println("Cannot extract E164 from \"" + sipUrl + "\". Not a SIP URL, skipping.");
+            return sipUrl;
+        }
+
+        // sip:2027621401@example.sip.twilio.com;user=phone -> 2027621401 (US)
+        String number = sipUrl.replace("sip:", "").split(Pattern.quote("@"))[0];
+
+        // 0012027621401 -> +12027621401 (US)
+        if (number.startsWith("00")) {
+            number = number.replaceAll("^00", "+");
+        }
+
+        // 2027621401 -> +12027621401 (US)
+        if (!number.startsWith("+")) {
+            // 02079460123 -> 2079460123 (UK)
+            if (number.startsWith("0")) {
+                number = number.replaceAll("^0", "");
+            }
+
+            number = defaultCountryCode + number;
+        }
+
+        return number;
+    }
+}
