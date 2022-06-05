@@ -31,7 +31,9 @@ inbound:
       '+1202555':
         url: 'https://user:pass@demo.twilio.com/welcome/voice/'
         method: GET
-  # Blocks incoming calls from numbers starting with these prefix
+  # Blocks incoming calls from numbers starting with these prefix.
+  # Please note that only the <Reject> verb (using say: false, or custom TwiML) avoids a call charge.
+  # Other forms of blocking the call will still incur charges per minute according to Twilio's pricing.
   block_prefixes:
     '+449':
       # You can set a string with a message that will be played before the call ends (responding with <Hangup>)
@@ -66,9 +68,7 @@ outbound:
       '+1202555':
         url: 'https://user:pass@demo.twilio.com/welcome/voice/'
         method: GET
-  # Blocks outgoing calls to numbers starting with these prefix.
-  # Please note that only the <Reject> verb (using say: false, or custom TwiML) avoids a call charge.
-  # Other forms of blocking the call will still incur charges per minute according to Twilio's pricing.
+  # Blocks outgoing calls to numbers starting with these prefix
   block_prefixes:
     '+449':
       # You can set a string with a message that will be played before the call ends (responding with <Hangup>)
