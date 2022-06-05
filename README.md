@@ -80,7 +80,7 @@ Due to complexities with extracting E.164 numbers from SIP URIs, calls to certai
 
 ### Toll-free Numbers (+1)
 
-For toll-free numbers using the +1 country code, you must dial the number in international format.
+For toll-free numbers using the +1 country code, you must dial the number in international format or without the leading `1`.
 
 **Do not** call 18004444444, **instead** call 0018004444444 or 8004444444. A fix for this is planned for future releases.
 
