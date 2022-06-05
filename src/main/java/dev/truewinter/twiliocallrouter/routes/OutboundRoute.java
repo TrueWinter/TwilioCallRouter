@@ -92,12 +92,6 @@ public class OutboundRoute implements Route {
             dial.number(number);
             voiceResponse.dial(dial.build());
             ctx.result(voiceResponse.build().toXml());
-
-            /*VoiceResponse.Builder temp = new VoiceResponse.Builder();
-            Reject.Builder tempReject = new Reject.Builder();
-            tempReject.reason(Reject.Reason.REJECTED);
-            temp.reject(tempReject.build());
-            ctx.result(temp.build().toXml());*/
         });
     }
 }
