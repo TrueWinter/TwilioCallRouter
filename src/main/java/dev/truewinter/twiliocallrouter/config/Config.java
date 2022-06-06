@@ -68,25 +68,29 @@ public class Config {
         Section inboundCustomHandlersExactConfig = inboundCustomHandlersConfig.getSection("exact");
         HashMap<String, CustomHandlerConfig> inboundCustomHandlersExactMap = new HashMap<>();
 
-        for (String number : inboundCustomHandlersExactConfig.getRoutesAsStrings(false)) {
-            inboundCustomHandlersExactMap.put(number,
-                    new CustomHandlerConfig(
+        if (inboundCustomHandlersExactConfig != null) {
+            for (String number : inboundCustomHandlersExactConfig.getRoutesAsStrings(false)) {
+                inboundCustomHandlersExactMap.put(number,
+                        new CustomHandlerConfig(
                             inboundCustomHandlersExactConfig.getSection(number).getString("url"),
                             CustomHandlerMethod.valueOf(inboundCustomHandlersExactConfig.getSection(number).getString("method"))
-                    )
-            );
+                        )
+                );
+            }
         }
 
         Section inboundCustomHandlersPrefixConfig = inboundCustomHandlersConfig.getSection("prefix");
         HashMap<String, CustomHandlerConfig> inboundCustomHandlersPrefixMap = new HashMap<>();
 
-        for (String number : inboundCustomHandlersPrefixConfig.getRoutesAsStrings(false)) {
-            inboundCustomHandlersPrefixMap.put(number,
-                    new CustomHandlerConfig(
+        if (inboundCustomHandlersPrefixConfig != null) {
+            for (String number : inboundCustomHandlersPrefixConfig.getRoutesAsStrings(false)) {
+                inboundCustomHandlersPrefixMap.put(number,
+                        new CustomHandlerConfig(
                             inboundCustomHandlersPrefixConfig.getSection(number).getString("url"),
                             CustomHandlerMethod.valueOf(inboundCustomHandlersPrefixConfig.getSection(number).getString("method"))
-                    )
-            );
+                        )
+                );
+            }
         }
 
         inboundConfig.setCustomHandlersConfig(new CustomHandlersConfig(inboundCustomHandlersExactMap, inboundCustomHandlersPrefixMap));
@@ -94,26 +98,28 @@ public class Config {
         Section inboundBlockPrefixesConfig = inbound.getSection("block_prefixes");
         HashMap<String, BlockPrefixesConfig> inboundBlockPrefixesMap = new HashMap<>();
 
-        for (String ibpCountry : inboundBlockPrefixesConfig.getRoutesAsStrings(false)) {
-            Section ibpCountrySection = inboundBlockPrefixesConfig.getSection(ibpCountry);
+        if (inboundBlockPrefixesConfig != null) {
+            for (String ibpCountry : inboundBlockPrefixesConfig.getRoutesAsStrings(false)) {
+                Section ibpCountrySection = inboundBlockPrefixesConfig.getSection(ibpCountry);
 
-            if (ibpCountrySection.contains("say")) {
-                if (ibpCountrySection.getString("say").equals("false")) {
-                    inboundBlockPrefixesMap.put(ibpCountry, new BlockPrefixesConfig(ibpCountry));
-                } else {
-                    inboundBlockPrefixesMap.put(ibpCountry, new BlockPrefixesConfig(ibpCountry, ibpCountrySection.getString("say")));
+                if (ibpCountrySection.contains("say")) {
+                    if (ibpCountrySection.getString("say").equals("false")) {
+                        inboundBlockPrefixesMap.put(ibpCountry, new BlockPrefixesConfig(ibpCountry));
+                    } else {
+                        inboundBlockPrefixesMap.put(ibpCountry, new BlockPrefixesConfig(ibpCountry, ibpCountrySection.getString("say")));
+                    }
+
+                    continue;
                 }
 
-                continue;
-            }
+                if (ibpCountrySection.contains("twiml")) {
+                    inboundBlockPrefixesMap.put(ibpCountry, new BlockPrefixesConfig(ibpCountry)
+                            .setTwiml(ibpCountrySection.getString("twiml")));
+                    continue;
+                }
 
-            if (ibpCountrySection.contains("twiml")) {
-                inboundBlockPrefixesMap.put(ibpCountry, new BlockPrefixesConfig(ibpCountry)
-                        .setTwiml(ibpCountrySection.getString("twiml")));
-                continue;
+                throw new Exception("block_prefixes config option must contain either say or twiml option");
             }
-
-            throw new Exception("block_prefixes config option must contain either say or twiml option");
         }
 
         inboundConfig.setBlockPrefixesConfig(inboundBlockPrefixesMap);
@@ -121,12 +127,14 @@ public class Config {
         Section inboundRoutedConfig = inbound.getSection("routed");
         HashMap<String, InboundRoutedConfig> inboundRoutedConfigMap = new HashMap<>();
 
-        for (String ircCountry : inboundRoutedConfig.getRoutesAsStrings(false)) {
-            boolean ircCountrySip = inboundRoutedConfig.getSection(ircCountry).getBoolean("sip");
-            String ircCountryNumber = inboundRoutedConfig.getSection(ircCountry).getString("number");
+        if (inboundRoutedConfig != null) {
+            for (String ircCountry : inboundRoutedConfig.getRoutesAsStrings(false)) {
+                boolean ircCountrySip = inboundRoutedConfig.getSection(ircCountry).getBoolean("sip");
+                String ircCountryNumber = inboundRoutedConfig.getSection(ircCountry).getString("number");
 
-            InboundRoutedConfig irc = new InboundRoutedConfig(ircCountry, ircCountrySip, ircCountryNumber);
-            inboundRoutedConfigMap.put(ircCountry, irc);
+                InboundRoutedConfig irc = new InboundRoutedConfig(ircCountry, ircCountrySip, ircCountryNumber);
+                inboundRoutedConfigMap.put(ircCountry, irc);
+            }
         }
 
         inboundConfig.setRoutedConfig(inboundRoutedConfigMap);
@@ -143,25 +151,29 @@ public class Config {
         Section outboundCustomHandlersExactConfig = outboundCustomHandlersConfig.getSection("exact");
         HashMap<String, CustomHandlerConfig> outboundCustomHandlersExactMap = new HashMap<>();
 
-        for (String number : outboundCustomHandlersExactConfig.getRoutesAsStrings(false)) {
-            outboundCustomHandlersExactMap.put(number,
-                    new CustomHandlerConfig(
-                        outboundCustomHandlersExactConfig.getSection(number).getString("url"),
-                        CustomHandlerMethod.valueOf(outboundCustomHandlersExactConfig.getSection(number).getString("method"))
-                    )
-            );
+        if (outboundCustomHandlersExactConfig != null) {
+            for (String number : outboundCustomHandlersExactConfig.getRoutesAsStrings(false)) {
+                outboundCustomHandlersExactMap.put(number,
+                        new CustomHandlerConfig(
+                            outboundCustomHandlersExactConfig.getSection(number).getString("url"),
+                            CustomHandlerMethod.valueOf(outboundCustomHandlersExactConfig.getSection(number).getString("method"))
+                        )
+                );
+            }
         }
 
         Section outboundCustomHandlersPrefixConfig = inboundCustomHandlersConfig.getSection("prefix");
         HashMap<String, CustomHandlerConfig> outboundCustomHandlersPrefixMap = new HashMap<>();
 
-        for (String number : outboundCustomHandlersPrefixConfig.getRoutesAsStrings(false)) {
-            outboundCustomHandlersPrefixMap.put(number,
-                    new CustomHandlerConfig(
-                        outboundCustomHandlersPrefixConfig.getSection(number).getString("url"),
-                        CustomHandlerMethod.valueOf(outboundCustomHandlersPrefixConfig.getSection(number).getString("method"))
-                    )
-            );
+        if (outboundCustomHandlersPrefixConfig != null) {
+            for (String number : outboundCustomHandlersPrefixConfig.getRoutesAsStrings(false)) {
+                outboundCustomHandlersPrefixMap.put(number,
+                        new CustomHandlerConfig(
+                            outboundCustomHandlersPrefixConfig.getSection(number).getString("url"),
+                            CustomHandlerMethod.valueOf(outboundCustomHandlersPrefixConfig.getSection(number).getString("method"))
+                        )
+                );
+            }
         }
 
         outboundConfig.setCustomHandlersConfig(new CustomHandlersConfig(outboundCustomHandlersExactMap, outboundCustomHandlersPrefixMap));
@@ -169,26 +181,28 @@ public class Config {
         Section outboundBlockPrefixesConfig = outbound.getSection("block_prefixes");
         HashMap<String, BlockPrefixesConfig> outboundBlockPrefixesMap = new HashMap<>();
 
-        for (String obpCountry : outboundBlockPrefixesConfig.getRoutesAsStrings(false)) {
-            Section obpCountrySection = outboundBlockPrefixesConfig.getSection(obpCountry);
+        if (outboundBlockPrefixesConfig != null) {
+            for (String obpCountry : outboundBlockPrefixesConfig.getRoutesAsStrings(false)) {
+                Section obpCountrySection = outboundBlockPrefixesConfig.getSection(obpCountry);
 
-            if (obpCountrySection.contains("say")) {
-                if (obpCountrySection.getString("say").equals("false")) {
-                    outboundBlockPrefixesMap.put(obpCountry, new BlockPrefixesConfig(obpCountry));
-                } else {
-                    outboundBlockPrefixesMap.put(obpCountry, new BlockPrefixesConfig(obpCountry, obpCountrySection.getString("say")));
+                if (obpCountrySection.contains("say")) {
+                    if (obpCountrySection.getString("say").equals("false")) {
+                        outboundBlockPrefixesMap.put(obpCountry, new BlockPrefixesConfig(obpCountry));
+                    } else {
+                        outboundBlockPrefixesMap.put(obpCountry, new BlockPrefixesConfig(obpCountry, obpCountrySection.getString("say")));
+                    }
+
+                    continue;
                 }
 
-                continue;
-            }
+                if (obpCountrySection.contains("twiml")) {
+                    outboundBlockPrefixesMap.put(obpCountry, new BlockPrefixesConfig(obpCountry)
+                            .setTwiml(obpCountrySection.getString("twiml")));
+                    continue;
+                }
 
-            if (obpCountrySection.contains("twiml")) {
-                outboundBlockPrefixesMap.put(obpCountry, new BlockPrefixesConfig(obpCountry)
-                        .setTwiml(obpCountrySection.getString("twiml")));
-                continue;
+                throw new Exception("block_prefixes config option must contain either say or twiml option");
             }
-
-            throw new Exception("block_prefixes config option must contain either say or twiml option");
         }
 
         outboundConfig.setBlockPrefixesConfig(outboundBlockPrefixesMap);
@@ -196,11 +210,13 @@ public class Config {
         Section outboundRoutedConfig = outbound.getSection("routed");
         HashMap<String, OutboundRoutedConfig> outboundRoutedConfigMap = new HashMap<>();
 
-        for (String orcCountry : outboundRoutedConfig.getRoutesAsStrings(false)) {
-            String orcCountryNumber = outboundRoutedConfig.getString(orcCountry);
+        if (outboundRoutedConfig != null) {
+            for (String orcCountry : outboundRoutedConfig.getRoutesAsStrings(false)) {
+                String orcCountryNumber = outboundRoutedConfig.getString(orcCountry);
 
-            OutboundRoutedConfig orc = new OutboundRoutedConfig(orcCountry, orcCountryNumber);
-            outboundRoutedConfigMap.put(orcCountry, orc);
+                OutboundRoutedConfig orc = new OutboundRoutedConfig(orcCountry, orcCountryNumber);
+                outboundRoutedConfigMap.put(orcCountry, orc);
+            }
         }
 
         outboundConfig.setRoutedConfig(outboundRoutedConfigMap);
