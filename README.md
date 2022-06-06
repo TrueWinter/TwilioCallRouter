@@ -18,7 +18,7 @@ username: twilio
 password: callrouter
 ```
 
-You can specify the voice and language to pass to Twilio when using the <Say> verb. Check the comments in the config file for more information.
+You can specify the voice and language to pass to Twilio when using the `<Say>` verb. Check the comments in the config file for more information.
 ```yaml
 voice: ALICE
 language: EN_GB
