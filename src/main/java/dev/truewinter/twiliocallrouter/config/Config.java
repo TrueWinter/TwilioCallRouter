@@ -21,6 +21,8 @@ public class Config {
     private String password;
     private Say.Voice voice;
     private Say.Language language;
+    private boolean enableRefer;
+    private boolean referForceHttps;
 
     private InboundConfig inboundConfig;
     private OutboundConfig outboundConfig;
@@ -39,6 +41,8 @@ public class Config {
         authEnabled = config.getBoolean("auth", true);
         username = config.getString("username", "twilio");
         password = config.getString("password", "callrouter");
+        enableRefer = config.getBoolean("enable_refer", false);
+        referForceHttps = config.getBoolean("refer_force_https", false);
 
         try {
             voice = Say.Voice.valueOf(config.getString("voice", "ALICE"));
@@ -230,6 +234,14 @@ public class Config {
         return authEnabled;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
     public boolean isValidLogin(String user, String pass) {
         return user.equals(username) && pass.equals(password);
     }
@@ -244,6 +256,14 @@ public class Config {
         }
 
         return language;
+    }
+
+    public boolean isReferEnabled() {
+        return enableRefer;
+    }
+
+    public boolean isReferHttpsForced() {
+        return this.referForceHttps;
     }
 
     public InboundConfig getInboundConfig() {

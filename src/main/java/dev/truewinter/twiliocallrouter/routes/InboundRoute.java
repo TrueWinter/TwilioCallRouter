@@ -1,5 +1,6 @@
 package dev.truewinter.twiliocallrouter.routes;
 
+import com.twilio.http.HttpMethod;
 import com.twilio.twiml.VoiceResponse;
 import com.twilio.twiml.voice.*;
 import dev.truewinter.twiliocallrouter.Util;
@@ -114,6 +115,16 @@ public class InboundRoute implements Route {
                 }
 
                 System.out.println("Calling \"" + defaultNumber + "\" due to call from \"" + number + "\"");
+            }
+
+            if (config.isReferEnabled()) {
+                try {
+                    dial.referUrl(Util.getReferUrl(ctx, config));
+                    dial.referMethod(HttpMethod.POST);
+                } catch (Exception e) {
+                    System.err.println("Failed to get refer URL");
+                    e.printStackTrace();
+                }
             }
 
             voiceResponse.dial(dial.build());

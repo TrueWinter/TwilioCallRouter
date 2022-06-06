@@ -3,6 +3,7 @@ package dev.truewinter.twiliocallrouter;
 import dev.truewinter.twiliocallrouter.config.Config;
 import dev.truewinter.twiliocallrouter.routes.InboundRoute;
 import dev.truewinter.twiliocallrouter.routes.OutboundRoute;
+import dev.truewinter.twiliocallrouter.routes.ReferRoute;
 import io.javalin.Javalin;
 import io.javalin.core.util.Header;
 import io.javalin.http.Context;
@@ -67,6 +68,15 @@ public class WebServer extends Thread {
 
             ctx.header(Header.CONTENT_TYPE, "text/xml");
             new OutboundRoute().handleRoute(ctx, config);
+        });
+
+        server.post("/refer", ctx -> {
+            if (doAuthIfEnabled(ctx)) {
+                return;
+            }
+
+            ctx.header(Header.CONTENT_TYPE, "text/xml");
+            new ReferRoute().handleRoute(ctx, config);
         });
     }
 }

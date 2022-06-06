@@ -12,6 +12,12 @@ voice: ALICE
 # The language to use. Has no effect when using Amazon Polly voices. Available options: https://www.twilio.com/docs/libraries/reference/twilio-java/8.31.0/com/twilio/twiml/voice/Say.Language.html
 language: EN_GB
 
+# Whether to enable SIP REFERs. You will need to enable the "Enhanced Programmable SIP Features" setting in the Twilio Console.
+# Please note that Twilio charges a fee per refer.
+enable_refer: false
+# Some reverse proxies (and tools like ngrok) do not forward the protocol. Enable this setting to force set the refer URL protocol to HTTPS
+refer_force_https: false
+
 # For incoming calls, where should TwilioCallRouter forward them to
 inbound:
   timeout: 20

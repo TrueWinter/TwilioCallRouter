@@ -24,6 +24,12 @@ voice: ALICE
 language: EN_GB
 ```
 
+If you would like to transfer calls to another SIP user, you can enable SIP REFERs. See the comments in the config file for more information.
+```yaml
+enable_refer: true
+refer_force_https: false
+```
+
 ### Directional Config
 
 Both `inbound` and `outbound` support the following options:
@@ -72,7 +78,7 @@ After buying a number, configure it to use a webhook when a call is received. Se
 
 You will also need to create a SIP domain, configuring it to use a webhook. Set the webhook to TwilioCallRouter's `/outbound` route, using the POST method.
 
-Installing TwilioCallRouter behind a reverse proxy, such as Nginx, and configuring SSL is recommended.
+Installing TwilioCallRouter behind a reverse proxy, such as Nginx, and configuring SSL is recommended. If using REFERs, please ensure that your proxy passes the protocol to TwilioCallRouter, or enable `refer_force_https`.
 
 ## Important Information
 
@@ -93,3 +99,7 @@ Short numbers (such as emergency numbers) are not supported at all at this time.
 All numbers are converted to E.164 numbers, which may have a different format to your country's usual international calling prefix. To call internationally, drop the leading `0` (if it exists) and prepend the number with `+` or `00` and then the country code. `00` will automatically be replaced with `+` before calling.
 
 For example, if calling the UK number `02079460123`, call `00442079460123`.
+
+### Cost
+
+Certain configurations of TwilioCallRouter will incur a cost. While I have tried to document this wherever possible, it is your responsibility to review and understand Twilio's pricing before using TwilioCallRouter.
