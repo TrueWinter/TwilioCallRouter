@@ -14,10 +14,18 @@ public class ReferRoute implements Route {
     @Override
     public void handleRoute(Context ctx, Config config) {
         String transferTo = ctx.formParam("ReferTransferTarget");
+        String direction = ctx.formParam("Direction");
+        String callerId = null;
 
-        if (transferTo == null) {
+        if (transferTo == null || direction == null) {
             handleError(ctx);
             return;
+        }
+
+        if (direction.startsWith("outbound") && ctx.formParam("To") != null) {
+            callerId = ctx.formParam("To");
+        } else if (direction.equals("inbound") && ctx.formParam("From") != null) {
+            callerId = ctx.formParam("From");
         }
 
         System.out.println("Received request to transfer call to \"" + transferTo + "\"");
@@ -35,6 +43,11 @@ public class ReferRoute implements Route {
 
         VoiceResponse.Builder voiceResponse = new VoiceResponse.Builder();
         Dial.Builder dial = new Dial.Builder();
+
+        if (callerId != null) {
+            dial.callerId(callerId);
+        }
+
         Sip.Builder sip = new Sip.Builder(transferToSip);
         dial.sip(sip.build());
         voiceResponse.dial(dial.build());

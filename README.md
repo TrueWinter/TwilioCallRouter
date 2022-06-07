@@ -78,7 +78,7 @@ After buying a number, configure it to use a webhook when a call is received. Se
 
 You will also need to create a SIP domain, configuring it to use a webhook. Set the webhook to TwilioCallRouter's `/outbound` route, using the POST method.
 
-Installing TwilioCallRouter behind a reverse proxy, such as Nginx, and configuring SSL is recommended. If using REFERs, please ensure that your proxy passes the protocol to TwilioCallRouter, or enable `refer_force_https`.
+Installing TwilioCallRouter behind a reverse proxy, such as Nginx, and configuring SSL is recommended. If using REFERs, please ensure that your proxy passes the protocol to TwilioCallRouter, or enable `refer_force_https`. Also ensure that the correct host header is passed.
 
 ## Important Information
 
