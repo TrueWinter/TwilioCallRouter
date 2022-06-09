@@ -84,4 +84,27 @@ public class Util {
         sb.append("/refer");
         return sb.toString();
     }
+
+    public static String getForwardUrl(Context ctx, Config config) throws MalformedURLException {
+        URL url = new URL(ctx.url());
+        StringBuilder sb = new StringBuilder();
+
+        if (config.isReferHttpsForced()) {
+            sb.append("https");
+        } else {
+            sb.append(url.getProtocol());
+        }
+        sb.append("://");
+
+        if (config.isAuthEnabled()) {
+            sb.append(config.getUsername());
+            sb.append(":");
+            sb.append(config.getPassword());
+            sb.append("@");
+        }
+
+        sb.append(ctx.host());
+        sb.append("/forward");
+        return sb.toString();
+    }
 }

@@ -42,6 +42,7 @@ default: '+17185550123'
 Additionally, both directions support the same config format for `block_prefixes`. For each prefix, one of the following can be used:
 - `say: 'some text here'`: This will instruct Twilio to say the string using the voice and language configured, before ending the call with `<Hangup>`.
 - `say: false`: This will end the call using the `<Reject>` verb.
+- `play: 'url to audio file'`: This will play an audio file before ending the call using `<Hangup>`. Ensure it is in a [supported format](https://www.twilio.com/docs/voice/twiml/play#supported-audio-file-types).
 - `twiml: '<Response>...</Response>'`: This will respond with custom TwiML.
 
 You can also specify custom handlers for both directions. The `custom_handlers` section is split into two parts: `exact` and `prefix`. For each number, you will need to specify the URL (which must serve valid TwiML) that Twilio will connect to, and the HTTP method (either `GET` or `POST`).
@@ -59,6 +60,16 @@ routed:
 ```
 
 The above config means that any calls coming from a number starting with `+1` will be forwarded to `+17185550123`.
+
+You can also forward incoming calls if the default number does not answer.
+```yaml
+forward_on_no_answer:
+  enabled: true
+  sip: true
+  number: sip:503@example.sip.twilio.com
+```
+
+The same call forwarding configuration (leaving out the `enabled` option) can be used for routed prefixes. To disable call forwarding for a routed prefix, you must remove the `forward_on_no_answer` section for that prefix. Please note that call forwards for routed prefixes will only work if default call forwarding is enabled.
 
 #### Outbound
 
@@ -102,4 +113,4 @@ For example, if calling the UK number `02079460123`, call `00442079460123`.
 
 ### Cost
 
-Certain configurations of TwilioCallRouter will incur a cost. While I have tried to document this wherever possible, it is your responsibility to review and understand Twilio's pricing before using TwilioCallRouter.
+Certain configurations of TwilioCallRouter will incur an additional cost. While I have tried to document this wherever possible, it is your responsibility to review and understand Twilio's pricing before using TwilioCallRouter.

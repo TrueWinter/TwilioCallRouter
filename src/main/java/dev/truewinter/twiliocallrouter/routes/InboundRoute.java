@@ -9,6 +9,7 @@ import dev.truewinter.twiliocallrouter.config.CustomHandlerConfig;
 import dev.truewinter.twiliocallrouter.config.InboundRoutedConfig;
 import io.javalin.http.Context;
 
+import java.net.MalformedURLException;
 import java.util.Optional;
 
 public class InboundRoute implements Route {
@@ -123,6 +124,16 @@ public class InboundRoute implements Route {
                     dial.referMethod(HttpMethod.POST);
                 } catch (Exception e) {
                     System.err.println("Failed to get refer URL");
+                    e.printStackTrace();
+                }
+            }
+
+            if (config.getInboundConfig().hasForwardingConfig()) {
+                try {
+                    dial.action(Util.getForwardUrl(ctx, config));
+                    dial.method(HttpMethod.POST);
+                } catch (MalformedURLException e) {
+                    System.err.println("Failed to get forward URL");
                     e.printStackTrace();
                 }
             }

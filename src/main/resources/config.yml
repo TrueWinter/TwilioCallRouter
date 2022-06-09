@@ -25,6 +25,11 @@ inbound:
   sip: true
   answerOnBridge: true
   default: 'sip:442079460123@example.sip.twilio.com'
+  # If there is no answer on the default number, it will be forwarded
+  forward_on_no_answer:
+    enabled: false
+    sip: true
+    number: sip:501@example.sip.twilio.com
   # For the numbers specified below, Twilio will be instructed to receive TwiML at the URL. Incoming calls will be in E.164 format.
   custom_handlers:
     # Match numbers exactly
@@ -52,6 +57,10 @@ inbound:
     '+1':
       sip: false
       number: '+17185550123'
+      # If there is no answer on the above number, it will be forwarded. Leave this section out to disable.
+      forward_on_no_answer:
+        sip: true
+        number: sip:503@example.sip.twilio.com
 
 # For outgoing calls
 outbound:
@@ -77,11 +86,8 @@ outbound:
   # Blocks outgoing calls to numbers starting with these prefix
   block_prefixes:
     '+449':
-      # You can set a string with a message that will be played before the call ends (responding with <Hangup>)
-      say: 'Calls to premium services are blocked'
-    '+448':
-      # Alternatively, set this to false to end the call immediately (responding with <Reject>)
-      say: false
+      # You can set a URL to an audio file that will be played before the call ends (responding with <Hangup>)
+      play: 'https://api.twilio.com/cowbell.mp3'
     '+1800':
       # Responding with custom TwiML is also possible
       twiml: |

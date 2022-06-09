@@ -1,6 +1,7 @@
 package dev.truewinter.twiliocallrouter;
 
 import dev.truewinter.twiliocallrouter.config.Config;
+import dev.truewinter.twiliocallrouter.routes.ForwardRoute;
 import dev.truewinter.twiliocallrouter.routes.InboundRoute;
 import dev.truewinter.twiliocallrouter.routes.OutboundRoute;
 import dev.truewinter.twiliocallrouter.routes.ReferRoute;
@@ -77,6 +78,15 @@ public class WebServer extends Thread {
 
             ctx.header(Header.CONTENT_TYPE, "text/xml");
             new ReferRoute().handleRoute(ctx, config);
+        });
+
+        server.post("/forward", ctx -> {
+            if (doAuthIfEnabled(ctx)) {
+                return;
+            }
+
+            ctx.header(Header.CONTENT_TYPE, "text/xml");
+            new ForwardRoute().handleRoute(ctx, config);
         });
     }
 }

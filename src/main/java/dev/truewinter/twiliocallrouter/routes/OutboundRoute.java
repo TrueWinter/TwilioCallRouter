@@ -66,6 +66,12 @@ public class OutboundRoute implements Route {
                 voiceResponse.say(say.build());
                 voiceResponse.hangup(new Hangup.Builder().build());
                 System.out.println("Call to \"" + number + "\" blocked, responded with voice string");
+            } else if (b.hasPlayURL()) {
+                Play.Builder play = new Play.Builder();
+                play.url(b.getPlayURL());
+                voiceResponse.play(play.build());
+                voiceResponse.hangup(new Hangup.Builder().build());
+                System.out.println("Call to \"" + number + "\" blocked, responded with audio URL");
             } else {
                 Reject.Builder reject = new Reject.Builder();
                 reject.reason(Reject.Reason.REJECTED);

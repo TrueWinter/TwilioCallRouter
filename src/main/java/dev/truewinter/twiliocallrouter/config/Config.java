@@ -9,9 +9,11 @@ import dev.dejvokep.boostedyaml.settings.general.GeneralSettings;
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 
+import javax.swing.text.html.Option;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.Optional;
 
 public class Config {
     private YamlDocument config;
@@ -68,65 +70,16 @@ public class Config {
         String inboundDefault = inbound.getString("default", "sip:442079460123@example.sip.twilio.com");
         inboundConfig = new InboundConfig(inboundTimeout, inboundAnswerOnBridge, inboundDefault, inboundSip);
 
+        Section forwardingConfig = inbound.getSection("forward_on_no_answer");
+        loadForwardingConfig(forwardingConfig).ifPresent(f -> {
+            inboundConfig.setForwardingConfig(f);
+        });
+
         Section inboundCustomHandlersConfig = inbound.getSection("custom_handlers");
-        Section inboundCustomHandlersExactConfig = inboundCustomHandlersConfig.getSection("exact");
-        HashMap<String, CustomHandlerConfig> inboundCustomHandlersExactMap = new HashMap<>();
-
-        if (inboundCustomHandlersExactConfig != null) {
-            for (String number : inboundCustomHandlersExactConfig.getRoutesAsStrings(false)) {
-                inboundCustomHandlersExactMap.put(number,
-                        new CustomHandlerConfig(
-                            inboundCustomHandlersExactConfig.getSection(number).getString("url"),
-                            CustomHandlerMethod.valueOf(inboundCustomHandlersExactConfig.getSection(number).getString("method"))
-                        )
-                );
-            }
-        }
-
-        Section inboundCustomHandlersPrefixConfig = inboundCustomHandlersConfig.getSection("prefix");
-        HashMap<String, CustomHandlerConfig> inboundCustomHandlersPrefixMap = new HashMap<>();
-
-        if (inboundCustomHandlersPrefixConfig != null) {
-            for (String number : inboundCustomHandlersPrefixConfig.getRoutesAsStrings(false)) {
-                inboundCustomHandlersPrefixMap.put(number,
-                        new CustomHandlerConfig(
-                            inboundCustomHandlersPrefixConfig.getSection(number).getString("url"),
-                            CustomHandlerMethod.valueOf(inboundCustomHandlersPrefixConfig.getSection(number).getString("method"))
-                        )
-                );
-            }
-        }
-
-        inboundConfig.setCustomHandlersConfig(new CustomHandlersConfig(inboundCustomHandlersExactMap, inboundCustomHandlersPrefixMap));
+        inboundConfig.setCustomHandlersConfig(loadCustomHandlersConfig(inboundCustomHandlersConfig));
 
         Section inboundBlockPrefixesConfig = inbound.getSection("block_prefixes");
-        HashMap<String, BlockPrefixesConfig> inboundBlockPrefixesMap = new HashMap<>();
-
-        if (inboundBlockPrefixesConfig != null) {
-            for (String ibpCountry : inboundBlockPrefixesConfig.getRoutesAsStrings(false)) {
-                Section ibpCountrySection = inboundBlockPrefixesConfig.getSection(ibpCountry);
-
-                if (ibpCountrySection.contains("say")) {
-                    if (ibpCountrySection.getString("say").equals("false")) {
-                        inboundBlockPrefixesMap.put(ibpCountry, new BlockPrefixesConfig(ibpCountry));
-                    } else {
-                        inboundBlockPrefixesMap.put(ibpCountry, new BlockPrefixesConfig(ibpCountry, ibpCountrySection.getString("say")));
-                    }
-
-                    continue;
-                }
-
-                if (ibpCountrySection.contains("twiml")) {
-                    inboundBlockPrefixesMap.put(ibpCountry, new BlockPrefixesConfig(ibpCountry)
-                            .setTwiml(ibpCountrySection.getString("twiml")));
-                    continue;
-                }
-
-                throw new Exception("block_prefixes config option must contain either say or twiml option");
-            }
-        }
-
-        inboundConfig.setBlockPrefixesConfig(inboundBlockPrefixesMap);
+        inboundConfig.setBlockPrefixesConfig(loadBlockedPrefixesConfig(inboundBlockPrefixesConfig));
 
         Section inboundRoutedConfig = inbound.getSection("routed");
         HashMap<String, InboundRoutedConfig> inboundRoutedConfigMap = new HashMap<>();
@@ -137,6 +90,15 @@ public class Config {
                 String ircCountryNumber = inboundRoutedConfig.getSection(ircCountry).getString("number");
 
                 InboundRoutedConfig irc = new InboundRoutedConfig(ircCountry, ircCountrySip, ircCountryNumber);
+                Section ircForwardingConfig = inboundRoutedConfig.getSection(ircCountry).getSection("forward_on_no_answer");
+
+                if (ircForwardingConfig != null) {
+                    boolean ircForwardingSip = ircForwardingConfig.getBoolean("sip");
+                    String ircForwardingNumber = ircForwardingConfig.getString("number");
+
+                    irc.setForwardingConfig(new ForwardingConfig(ircForwardingSip, ircForwardingNumber));
+                }
+
                 inboundRoutedConfigMap.put(ircCountry, irc);
             }
         }
@@ -152,64 +114,10 @@ public class Config {
         outboundConfig = new OutboundConfig(outboundTimeout, outboundAnswerOnBridge, outboundDefault, outboundDefaultCountryCode);
 
         Section outboundCustomHandlersConfig = outbound.getSection("custom_handlers");
-        Section outboundCustomHandlersExactConfig = outboundCustomHandlersConfig.getSection("exact");
-        HashMap<String, CustomHandlerConfig> outboundCustomHandlersExactMap = new HashMap<>();
-
-        if (outboundCustomHandlersExactConfig != null) {
-            for (String number : outboundCustomHandlersExactConfig.getRoutesAsStrings(false)) {
-                outboundCustomHandlersExactMap.put(number,
-                        new CustomHandlerConfig(
-                            outboundCustomHandlersExactConfig.getSection(number).getString("url"),
-                            CustomHandlerMethod.valueOf(outboundCustomHandlersExactConfig.getSection(number).getString("method"))
-                        )
-                );
-            }
-        }
-
-        Section outboundCustomHandlersPrefixConfig = inboundCustomHandlersConfig.getSection("prefix");
-        HashMap<String, CustomHandlerConfig> outboundCustomHandlersPrefixMap = new HashMap<>();
-
-        if (outboundCustomHandlersPrefixConfig != null) {
-            for (String number : outboundCustomHandlersPrefixConfig.getRoutesAsStrings(false)) {
-                outboundCustomHandlersPrefixMap.put(number,
-                        new CustomHandlerConfig(
-                            outboundCustomHandlersPrefixConfig.getSection(number).getString("url"),
-                            CustomHandlerMethod.valueOf(outboundCustomHandlersPrefixConfig.getSection(number).getString("method"))
-                        )
-                );
-            }
-        }
-
-        outboundConfig.setCustomHandlersConfig(new CustomHandlersConfig(outboundCustomHandlersExactMap, outboundCustomHandlersPrefixMap));
+        outboundConfig.setCustomHandlersConfig(loadCustomHandlersConfig(outboundCustomHandlersConfig));
 
         Section outboundBlockPrefixesConfig = outbound.getSection("block_prefixes");
-        HashMap<String, BlockPrefixesConfig> outboundBlockPrefixesMap = new HashMap<>();
-
-        if (outboundBlockPrefixesConfig != null) {
-            for (String obpCountry : outboundBlockPrefixesConfig.getRoutesAsStrings(false)) {
-                Section obpCountrySection = outboundBlockPrefixesConfig.getSection(obpCountry);
-
-                if (obpCountrySection.contains("say")) {
-                    if (obpCountrySection.getString("say").equals("false")) {
-                        outboundBlockPrefixesMap.put(obpCountry, new BlockPrefixesConfig(obpCountry));
-                    } else {
-                        outboundBlockPrefixesMap.put(obpCountry, new BlockPrefixesConfig(obpCountry, obpCountrySection.getString("say")));
-                    }
-
-                    continue;
-                }
-
-                if (obpCountrySection.contains("twiml")) {
-                    outboundBlockPrefixesMap.put(obpCountry, new BlockPrefixesConfig(obpCountry)
-                            .setTwiml(obpCountrySection.getString("twiml")));
-                    continue;
-                }
-
-                throw new Exception("block_prefixes config option must contain either say or twiml option");
-            }
-        }
-
-        outboundConfig.setBlockPrefixesConfig(outboundBlockPrefixesMap);
+        outboundConfig.setBlockPrefixesConfig(loadBlockedPrefixesConfig(outboundBlockPrefixesConfig));
 
         Section outboundRoutedConfig = outbound.getSection("routed");
         HashMap<String, OutboundRoutedConfig> outboundRoutedConfigMap = new HashMap<>();
@@ -272,6 +180,94 @@ public class Config {
 
     public OutboundConfig getOutboundConfig() {
         return outboundConfig;
+    }
+
+    private HashMap<String, BlockPrefixesConfig> loadBlockedPrefixesConfig(Section section) throws Exception {
+        HashMap<String, BlockPrefixesConfig> outMap = new HashMap<>();
+        if (section != null) {
+            for (String prefix : section.getRoutesAsStrings(false)) {
+                Section prefixSection = section.getSection(prefix);
+
+                if (prefixSection.contains("say")) {
+                    if (prefixSection.getString("say").equals("false")) {
+                        outMap.put(prefix, new BlockPrefixesConfig(prefix));
+                    } else {
+                        outMap.put(prefix, new BlockPrefixesConfig(prefix, prefixSection.getString("say")));
+                    }
+
+                    continue;
+                }
+
+                if (prefixSection.contains("twiml")) {
+                    outMap.put(prefix, new BlockPrefixesConfig(prefix)
+                            .setTwiml(prefixSection.getString("twiml")));
+                    continue;
+                }
+
+                if (prefixSection.contains("play")) {
+                    outMap.put(prefix, new BlockPrefixesConfig(prefix)
+                            .setPlayURL(prefixSection.getString("play")));
+                    continue;
+                }
+
+                throw new Exception("block_prefixes config option must contain one of: say, twiml, play");
+            }
+        }
+
+        return outMap;
+    }
+
+    private CustomHandlersConfig loadCustomHandlersConfig(Section section) {
+        Section customHandlersExactConfig = section.getSection("exact");
+        HashMap<String, CustomHandlerConfig> customHandlersExactMap = new HashMap<>();
+
+        if (customHandlersExactConfig != null) {
+            for (String number : customHandlersExactConfig.getRoutesAsStrings(false)) {
+                customHandlersExactMap.put(number,
+                        new CustomHandlerConfig(
+                                customHandlersExactConfig.getSection(number).getString("url"),
+                                CustomHandlerMethod.valueOf(customHandlersExactConfig.getSection(number).getString("method"))
+                        )
+                );
+            }
+        }
+
+        Section customHandlersPrefixConfig = section.getSection("prefix");
+        HashMap<String, CustomHandlerConfig> customHandlersPrefixMap = new HashMap<>();
+
+        if (customHandlersPrefixConfig != null) {
+            for (String number : customHandlersPrefixConfig.getRoutesAsStrings(false)) {
+                customHandlersPrefixMap.put(number,
+                        new CustomHandlerConfig(
+                                customHandlersPrefixConfig.getSection(number).getString("url"),
+                                CustomHandlerMethod.valueOf(customHandlersPrefixConfig.getSection(number).getString("method"))
+                        )
+                );
+            }
+        }
+
+        return new CustomHandlersConfig(customHandlersExactMap, customHandlersPrefixMap);
+    }
+
+    private Optional<ForwardingConfig> loadForwardingConfig(Section section) {
+        if (section == null) {
+            return Optional.empty();
+        }
+
+        boolean enabled = section.getBoolean("enabled");
+        boolean sip = section.getBoolean("sip");
+        String number = section.getString("number");
+
+        if (!enabled) {
+            return Optional.empty();
+        }
+
+        if (number.equals(inboundConfig.getDefaultNumber())) {
+            System.err.println("Forward number cannot be the same as default number");
+            return Optional.empty();
+        }
+
+        return Optional.of(new ForwardingConfig(sip, number));
     }
 }
 

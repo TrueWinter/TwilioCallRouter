@@ -7,6 +7,7 @@ public class BlockPrefixesConfig {
     private String prefix;
     private boolean shouldSay;
     private String sayString;
+    private String playURL = null;
     private VoiceResponse voiceResponse = null;
 
     BlockPrefixesConfig(String prefix) {
@@ -18,6 +19,11 @@ public class BlockPrefixesConfig {
         this.prefix = prefix;
         this.shouldSay = true;
         this.sayString = sayString;
+    }
+
+    public BlockPrefixesConfig setPlayURL(String url) {
+        this.playURL = url;
+        return this;
     }
 
     public BlockPrefixesConfig setTwiml(String twiml) throws TwiMLException {
@@ -39,6 +45,14 @@ public class BlockPrefixesConfig {
 
     public String getSayString() {
         return sayString;
+    }
+
+    public boolean hasPlayURL() {
+        return this.playURL != null;
+    }
+
+    public String getPlayURL() {
+        return this.playURL;
     }
 
     public VoiceResponse getVoiceResponse() {
