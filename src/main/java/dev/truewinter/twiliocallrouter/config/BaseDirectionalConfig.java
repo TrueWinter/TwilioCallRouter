@@ -5,25 +5,19 @@ import java.util.Optional;
 
 public class BaseDirectionalConfig<T extends BaseDirectionalRoutedConfig> {
     private int timeout;
-    private boolean answerOnBridge;
     private String defaultNumber;
     private CustomHandlersConfig customHandlersConfig;
 
     private HashMap<String, BlockPrefixesConfig> blockPrefixesConfig;
     private HashMap<String, T> routedConfig;
 
-    public BaseDirectionalConfig(int timeout, boolean answerOnBridge, String defaultNumber) {
+    public BaseDirectionalConfig(int timeout, String defaultNumber) {
         this.timeout = timeout;
-        this.answerOnBridge = answerOnBridge;
         this.defaultNumber = defaultNumber;
     }
 
     public int getTimeout() {
         return timeout;
-    }
-
-    public boolean answerOnBridge() {
-        return answerOnBridge;
     }
 
     public String getDefaultNumber() {

@@ -78,7 +78,6 @@ public class InboundRoute implements Route {
             VoiceResponse.Builder voiceResponse = new VoiceResponse.Builder();
             Dial.Builder dial = new Dial.Builder();
             dial.timeout(config.getInboundConfig().getTimeout());
-            dial.answerOnBridge(config.getInboundConfig().answerOnBridge());
 
             Optional<InboundRoutedConfig> routedConfig = config.getInboundConfig().getRoutedPrefixConfig(number);
 
