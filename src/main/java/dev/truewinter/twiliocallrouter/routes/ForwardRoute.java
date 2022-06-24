@@ -34,6 +34,7 @@ public class ForwardRoute implements Route {
             VoiceResponse.Builder voiceResponse = new VoiceResponse.Builder();
             Dial.Builder dial = new Dial.Builder();
             dial.timeout(config.getInboundConfig().getTimeout());
+            dial.answerOnBridge(config.getInboundConfig().answerOnBridge());
 
             if (forwardingConfig.get().isSip()) {
                 Sip.Builder sip = new Sip.Builder(forwardingConfig.get().getNumber());

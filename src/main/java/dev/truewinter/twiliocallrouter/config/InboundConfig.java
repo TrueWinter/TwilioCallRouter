@@ -6,9 +6,9 @@ public class InboundConfig extends BaseDirectionalConfig<InboundRoutedConfig> {
     private boolean sip;
     private ForwardingConfig forwardingConfig = null;
 
-    public InboundConfig(int timeout, String defaultNumber,
+    public InboundConfig(int timeout, boolean answerOnBridge, String defaultNumber,
                          boolean sip) {
-        super(timeout, defaultNumber);
+        super(timeout, answerOnBridge, defaultNumber);
         this.sip = sip;
     }
 

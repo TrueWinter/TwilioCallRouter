@@ -84,6 +84,7 @@ public class OutboundRoute implements Route {
             VoiceResponse.Builder voiceResponse = new VoiceResponse.Builder();
             Dial.Builder dial = new Dial.Builder();
             dial.timeout(config.getOutboundConfig().getTimeout());
+            dial.answerOnBridge(config.getOutboundConfig().answerOnBridge());
 
             Optional<OutboundRoutedConfig> routedConfig = config.getOutboundConfig().getRoutedPrefixConfig(number);
 

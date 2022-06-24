@@ -6,7 +6,7 @@
 
     <groupId>dev.truewinter</groupId>
     <artifactId>TwilioCallRouter</artifactId>
-    <version>0.0.7</version>
+    <version>0.0.6</version>
 
     <dependencies>
         <dependency>

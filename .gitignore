@@ -2,6 +2,5 @@ target/
 build/
 /config.yml
 /config.yml.t
-ltwTunId.txt
 
 .idea

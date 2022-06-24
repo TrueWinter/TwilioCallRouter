@@ -66,8 +66,9 @@ public class Config {
         Section inbound = config.getSection("inbound");
         int inboundTimeout = inbound.getInt("timeout", 20);
         boolean inboundSip = inbound.getBoolean("sip", true);
+        boolean inboundAnswerOnBridge = inbound.getBoolean("answerOnBridge", true);
         String inboundDefault = inbound.getString("default", "sip:442079460123@example.sip.twilio.com");
-        inboundConfig = new InboundConfig(inboundTimeout, inboundDefault, inboundSip);
+        inboundConfig = new InboundConfig(inboundTimeout, inboundAnswerOnBridge, inboundDefault, inboundSip);
 
         Section forwardingConfig = inbound.getSection("forward_on_no_answer");
         loadForwardingConfig(forwardingConfig).ifPresent(f -> {
@@ -107,9 +108,10 @@ public class Config {
         // Outbound config
         Section outbound = config.getSection("outbound");
         int outboundTimeout = outbound.getInt("timeout", 20);
+        boolean outboundAnswerOnBridge = outbound.getBoolean("answerOnBridge", true);
         String outboundDefault = outbound.getString("default", "+442079460123");
         String outboundDefaultCountryCode = outbound.getString("default_country_code", "+44");
-        outboundConfig = new OutboundConfig(outboundTimeout, outboundDefault, outboundDefaultCountryCode);
+        outboundConfig = new OutboundConfig(outboundTimeout, outboundAnswerOnBridge, outboundDefault, outboundDefaultCountryCode);
 
         Section outboundCustomHandlersConfig = outbound.getSection("custom_handlers");
         outboundConfig.setCustomHandlersConfig(loadCustomHandlersConfig(outboundCustomHandlersConfig));
