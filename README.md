@@ -39,6 +39,8 @@ answerOnBridge: true
 default: '+17185550123'
 ```
 
+If you use the call forwarding feature, please ensure that the inbound timeout is set low enough that the outbound timeout of other providers don't cause the call to be ended too soon.
+
 Additionally, both directions support the same config format for `block_prefixes`. For each prefix, one of the following can be used:
 - `say: 'some text here'`: This will instruct Twilio to say the string using the voice and language configured, before ending the call with `<Hangup>`.
 - `say: false`: This will end the call using the `<Reject>` verb.
