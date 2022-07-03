@@ -5,12 +5,13 @@
     <parent>
         <artifactId>TwilioCallRouter</artifactId>
         <groupId>dev.truewinter</groupId>
-        <version>0.0.9</version>
+        <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dev.truewinter.twiliocallrouter</groupId>
     <artifactId>api</artifactId>
+    <version>${project.parent.version}</version>
 
     <dependencies>
         <dependency>
