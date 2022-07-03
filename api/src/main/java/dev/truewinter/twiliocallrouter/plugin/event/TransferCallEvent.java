@@ -26,10 +26,12 @@ public class TransferCallEvent extends Event {
         return direction;
     }
 
+    @NotNull
     public String getFrom() {
         return from;
     }
 
+    @NotNull
     public String getTo() {
         return to;
     }
