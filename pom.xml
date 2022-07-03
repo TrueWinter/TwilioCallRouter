@@ -7,7 +7,7 @@
     <groupId>dev.truewinter</groupId>
     <artifactId>TwilioCallRouter</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.9</version>
+    <version>${revision}</version>
 
     <modules>
         <module>api</module>
@@ -30,6 +30,7 @@
 
 
     <properties>
+        <revision>0.0.9</revision>
         <maven.compiler.source>16</maven.compiler.source>
         <maven.compiler.target>16</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
