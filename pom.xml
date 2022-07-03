@@ -7,15 +7,29 @@
     <groupId>dev.truewinter</groupId>
     <artifactId>TwilioCallRouter</artifactId>
     <packaging>pom</packaging>
-    <version>${revision}</version>
+    <version>0.0.9</version>
 
     <modules>
         <module>api</module>
         <module>callrouter</module>
     </modules>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.11.0</version>
+                <configuration>
+                    <generateBackupPoms>false</generateBackupPoms>
+                    <processAllModules>true</processAllModules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+
     <properties>
-        <revision>0.0.9</revision>
         <maven.compiler.source>16</maven.compiler.source>
         <maven.compiler.target>16</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
