@@ -1,13 +1,18 @@
 package dev.truewinter.twiliocallrouter;
 
+import com.twilio.twiml.VoiceResponse;
 import dev.truewinter.twiliocallrouter.config.Config;
 import io.javalin.http.Context;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -106,5 +111,26 @@ public class Util {
         sb.append(ctx.host());
         sb.append("/forward");
         return sb.toString();
+    }
+
+    public static List<File> getPluginJars() throws Exception {
+        List<File> pluginJars = new ArrayList<>();
+
+        File[] files = Path.of(getInstallPath().toString(), "plugins").toFile().listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.endsWith(".jar");
+            }
+        });
+
+        if (files != null) {
+            for (File file : files) {
+                if (file.isFile()) {
+                    pluginJars.add(file);
+                }
+            }
+        }
+
+        return pluginJars;
     }
 }

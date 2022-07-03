@@ -1,6 +1,7 @@
 package dev.truewinter.twiliocallrouter;
 
 import dev.truewinter.twiliocallrouter.config.Config;
+import dev.truewinter.twiliocallrouter.plugin.PluginManager;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -20,6 +21,13 @@ public class TwilioCallRouter {
             Path configPath = Path.of(Util.getInstallPath().toString(), "config.yml");
             config = new Config(configPath.toFile());
         } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            PluginManager.loadPlugins(Util.getPluginJars());
+        } catch (Exception e) {
+            System.err.println("Failed to load plugins");
             throw new RuntimeException(e);
         }
 

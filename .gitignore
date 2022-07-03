@@ -3,5 +3,6 @@ build/
 /config.yml
 /config.yml.t
 /ltwTunId.txt
+/plugins
 
 .idea

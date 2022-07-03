@@ -6,129 +6,16 @@
 
     <groupId>dev.truewinter</groupId>
     <artifactId>TwilioCallRouter</artifactId>
-    <version>0.0.8</version>
+    <packaging>pom</packaging>
+    <version>${revision}</version>
 
-    <dependencies>
-        <dependency>
-            <groupId>io.javalin</groupId>
-            <artifactId>javalin</artifactId>
-            <version>4.6.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.31</version>
-        </dependency>
-        <dependency>
-            <groupId>com.twilio.sdk</groupId>
-            <artifactId>twilio</artifactId>
-            <version>8.29.1</version>
-        </dependency>
-        <dependency>
-            <groupId>dev.dejvokep</groupId>
-            <artifactId>boosted-yaml</artifactId>
-            <version>1.1</version>
-        </dependency>
-    </dependencies>
-
-    <build>
-        <finalName>${project.artifactId}-${project.version}</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.3.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <outputFile>build/${project.version}/${project.artifactId}-${project.version}.jar</outputFile>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <shadedArtifactAttached>false</shadedArtifactAttached>
-                            <!-- See comment about SQLite below -->
-                            <minimizeJar>true</minimizeJar>
-                            <!-- https://stackoverflow.com/a/47003226 -->
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <manifestEntries>
-                                        <Main-Class>dev.truewinter.twiliocallrouter.TwilioCallRouter</Main-Class>
-                                    </manifestEntries>
-                                </transformer>
-                            </transformers>
-                            <filters>
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <exclude>module-info.class</exclude>
-                                        <exclude>META-INF/*</exclude>
-                                        <!-- Some files from Jetty got included in the root directory -->
-                                        <exclude>about.html</exclude>
-                                        <exclude>jetty-dir.css</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
-                            <relocations>
-                                <relocation>
-                                    <pattern>io.javalin</pattern>
-                                    <shadedPattern>dev.truewinter.twiliocallrouter.libraries.javalin</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.slf4j</pattern>
-                                    <shadedPattern>dev.truewinter.twiliocallrouter.libraries.slf4j</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.eclipse</pattern>
-                                    <shadedPattern>dev.truewinter.twiliocallrouter.libraries.eclipse</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.jetbrains</pattern>
-                                    <shadedPattern>dev.truewinter.twiliocallrouter.libraries.jetbrains</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.intellij</pattern>
-                                    <shadedPattern>dev.truewinter.twiliocallrouter.libraries.intellij</shadedPattern>
-                                </relocation>
-                                <!-- really don't need kotlin in the root directory -->
-                                <relocation>
-                                    <pattern>kotlin</pattern>
-                                    <shadedPattern>dev.truewinter.twiliocallrouter.libraries.kotlin</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>com.twilio</pattern>
-                                    <shadedPattern>dev.truewinter.twiliocallrouter.libraries.twilio</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>dev.dejvokep.boostedyaml</pattern>
-                                    <shadedPattern>dev.truewinter.twiliocallrouter.libraries.boostedyaml</shadedPattern>
-                                </relocation>
-                            </relocations>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>*.properties</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </resource>
-        </resources>
-    </build>
+    <modules>
+        <module>api</module>
+        <module>callrouter</module>
+    </modules>
 
     <properties>
+        <revision>0.0.9</revision>
         <maven.compiler.source>16</maven.compiler.source>
         <maven.compiler.target>16</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
