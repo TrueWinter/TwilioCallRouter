@@ -10,10 +10,13 @@ public abstract class Plugin {
     public abstract void onUnload();
 
     // No-op methods that have actual implementations in the callrouter module
-    protected final void registerListeners(@NotNull Plugin plugin, @NotNull Listener listener) {};
+    protected final void registerListeners(@NotNull Plugin plugin, @NotNull Listener listener) {}
+    protected final Logger getLogger() {
+        return new NoopLogger();
+    }
 
     @Nullable
-    protected final Plugin getPluginByName(@NotNull String name) {
+    protected final Plugin getPluginByName(@NotNull String name) throws ClassCastException, IllegalStateException {
         // This is a weird way of doing it, but to make sure that Java doesn't think this
         // method always returns a non-null value when plugin developers are using this method,
         // we need a way of tricking the compiler. Feel free to change this if you have a

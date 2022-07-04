@@ -8,6 +8,7 @@ import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings;
 import dev.dejvokep.boostedyaml.settings.general.GeneralSettings;
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
+import dev.truewinter.twiliocallrouter.TwilioCallRouter;
 
 import javax.swing.text.html.Option;
 import java.io.File;
@@ -48,17 +49,17 @@ public class Config {
 
         try {
             voice = Say.Voice.valueOf(config.getString("voice", "ALICE"));
-            System.out.println("Using voice \"" + voice + "\"");
+            TwilioCallRouter.getLogger().info("Using voice \"" + voice + "\"");
         } catch(Exception e) {
-            System.out.println("Voice does not exist, switching to default");
+            TwilioCallRouter.getLogger().warn("Voice does not exist, switching to default");
             voice = Say.Voice.ALICE;
         }
 
         try {
             language = Say.Language.valueOf(config.getString("language", "EN_GB"));
-            System.out.println("Using language \"" + language + "\"");
+            TwilioCallRouter.getLogger().info("Using language \"" + language + "\"");
         } catch (Exception e) {
-            System.out.println("Language invalid, switching to default");
+            TwilioCallRouter.getLogger().warn("Language invalid, switching to default");
             language = Say.Language.EN_GB;
         }
 
@@ -263,7 +264,7 @@ public class Config {
         }
 
         if (number.equals(inboundConfig.getDefaultNumber())) {
-            System.err.println("Forward number cannot be the same as default number");
+            TwilioCallRouter.getLogger().error("Forward number cannot be the same as default number");
             return Optional.empty();
         }
 

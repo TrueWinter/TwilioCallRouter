@@ -2,9 +2,11 @@ package dev.truewinter.twiliocallrouter.plugin;
 
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.truewinter.twiliocallrouter.TwilioCallRouter;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -13,8 +15,10 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PluginManager {
+    private static final Logger logger = TwilioCallRouter.getLogger();
+    private static boolean allPluginsLoaded = false;
     private static final ConcurrentHashMap<String, Plugin> plugins = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<Class<? extends Event>, LinkedHashMap<Listener, Method>> events = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Class<? extends Event>, LinkedHashMap<Plugin, Method>> events = new ConcurrentHashMap<>();
 
     public static void loadPlugins(List<File> pluginJars) {
         for (File file : pluginJars) {
@@ -38,7 +42,7 @@ public class PluginManager {
                 plugins.put(name, pluginInstance);
                 pluginClass.getMethod("onLoad").invoke(pluginInstance);
 
-                System.out.println("Plugin \"" + pluginInstance.getName() + "\" loaded.");
+                logger.info("Plugin \"" + pluginInstance.getName() + "\" loaded.");
                 plugin.close();
             } catch (Exception e) {
                 if (thisPlugin != null) {
@@ -50,32 +54,36 @@ public class PluginManager {
                     }
                 }
 
-                System.err.println("Unable to load plugin with file name \"" + file.getName() + "\".");
-                e.printStackTrace();
+                logger.error("Unable to load plugin with file name \"" + file.getName() + "\".", e);
             }
         }
+
+        allPluginsLoaded = true;
+        plugins.forEach((name, plugin) -> {
+            if (doesPluginImplementExternalPlugin(plugin)) {
+                try {
+                    plugin.getClass().getMethod("onAllPluginsLoaded").invoke(plugin);
+                } catch (Exception e) {
+                    logger.error("Failed to call onAllPluginsLoaded method for plugin \"" + name + "\".", e);
+                }
+            }
+        });
     }
 
     public static void unloadPlugin(Plugin plugin) throws IOException {
         plugins.remove(plugin.getName());
 
         events.forEach((eventClass, listeners) -> {
-            listeners.forEach((listener, method) -> {
-                try {
-                    YamlDocument thisPluginYaml = YamlDocument.create(Objects.requireNonNull(listener.getClass().getResourceAsStream("plugin.yml")));
-                    String thisPluginName = thisPluginYaml.getString("name");
-
-                    if (thisPluginName.equals(plugin.getName())) {
-                        listeners.remove(listener);
-                        plugin.getClass().getMethod("onUnload").invoke(plugin);
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            events.get(eventClass).remove(plugin);
         });
 
-        System.out.println("Unloaded plugin \"" + plugin.getName() + "\"");
+        try {
+            plugin.getClass().getMethod("onUnload").invoke(plugin);
+        } catch (Exception e) {
+            logger.error("Unable to call onUnload method while unloading plugin \"" + plugin.getName() + "\"", e);
+        }
+
+        logger.info("Unloaded plugin \"" + plugin.getName() + "\"");
     }
 
     // By splitting this class into many simple methods, it makes stack traces
@@ -112,7 +120,7 @@ public class PluginManager {
         }
     }
 
-    public static void registerListener(Plugin plugin, Listener listener) throws Exception {
+    public static synchronized void registerListener(Plugin plugin, Listener listener) throws Exception {
         if (!plugins.contains(plugin)) {
             throw new Exception("Failed to register listeners for plugin \"" + plugin.getName() + "\". Plugin not loaded.");
         }
@@ -132,7 +140,7 @@ public class PluginManager {
                         events.put(firstParam.asSubclass(Event.class), new LinkedHashMap<>());
                     }
 
-                    events.get(firstParam.asSubclass(Event.class)).put(listener, method);
+                    events.get(firstParam.asSubclass(Event.class)).put(plugin, method);
                 } catch (Exception e) {
                     throw new Exception("Failed to load listener method \"" + method.getName() + "\" in plugin \"" + plugin.getName() + "\":", e);
                 }
@@ -140,7 +148,7 @@ public class PluginManager {
         }
     }
 
-    public static <T extends Event> T fireEvent(T event) {
+    public static synchronized <T extends Event> T fireEvent(T event) {
         if (!events.containsKey(event.getClass())) return event;
 
         events.get(event.getClass()).forEach((listener, method) -> {
@@ -148,8 +156,7 @@ public class PluginManager {
                 try {
                     method.invoke(listener, event);
                 } catch (Exception e) {
-                    System.err.println("Failed to fire event:");
-                    e.printStackTrace();
+                    logger.error("Failed to fire event", e);
                 }
             }
         });
@@ -157,11 +164,37 @@ public class PluginManager {
         return event;
     }
 
-    protected static Plugin getPluginByName(String name) {
+    private static boolean doesPluginImplementExternalPlugin(Plugin requestingPlugin) {
+        try {
+            return ExternalPlugin.class.isAssignableFrom(requestingPlugin.getClass());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    protected static synchronized Plugin getPluginByName(Plugin requestingPlugin, String name) throws ClassCastException, IllegalStateException {
+        if (!doesPluginImplementExternalPlugin(requestingPlugin)) {
+            throw new ClassCastException("Plugin must implement ExternalPlugin to use the getPluginByName method.");
+        }
+
+        if (!allPluginsLoaded) {
+            throw new IllegalStateException("The getPluginByName method can only be called after all plugins have been loaded.");
+        }
+
         if (!plugins.containsKey(name)) {
             return null;
         }
 
         return plugins.get(name);
+    }
+
+    public static synchronized void handleShutdown() {
+        plugins.forEach((name, plugin) -> {
+            try {
+                unloadPlugin(plugin);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 }

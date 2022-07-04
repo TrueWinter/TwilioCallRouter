@@ -1,10 +1,13 @@
 package dev.truewinter.twiliocallrouter.plugin;
 
+import dev.truewinter.twiliocallrouter.TwilioCallRouter;
+
 import java.io.IOException;
-import java.util.Optional;
 
 // IMPORTANT: If you add methods to this class intended for plugin use, you
-// will also need to add no-op methods to the Plugin class in the api module
+// will also need to add no-op methods to the Plugin class in the api module.
+// This weird arrangement of classes is required to keep the internal methods
+// hidden from the plugin, while still allowing everything to work well.
 public abstract class Plugin {
     private String name;
 
@@ -15,7 +18,7 @@ public abstract class Plugin {
         try {
             PluginManager.registerListener(plugin, listener);
         } catch (Exception e) {
-            System.err.println("Failed to register event listeners, unloading plugin");
+            TwilioCallRouter.getLogger().error("Failed to register event listeners, unloading plugin");
             try {
                 PluginManager.unloadPlugin(plugin);
             } catch (IOException ex) {
@@ -25,8 +28,21 @@ public abstract class Plugin {
         }
     }
 
-    protected Plugin getPluginByName(String name) {
-        return PluginManager.getPluginByName(name);
+    protected final Logger getLogger() {
+        return new PluginLogger(this);
+    }
+
+    protected Plugin getPluginByName(String name) throws ClassCastException, IllegalStateException {
+        try {
+            return PluginManager.getPluginByName(this, name);
+        } catch (Exception e) {
+            try {
+                PluginManager.unloadPlugin(this);
+            } catch (Exception ex) {
+                TwilioCallRouter.getLogger().error("Failed to unload plugin", ex);
+            }
+            throw e;
+        }
     }
 
     // INTERNAL METHOD
