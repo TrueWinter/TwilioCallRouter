@@ -10,23 +10,28 @@ public class PluginLogger implements Logger {
         this.plugin = plugin;
     }
 
+    // TODO: Try to get console colours working
     @Override
     public void info(String s) {
-        logger.info(String.format("[%s] %s", plugin.getName(), s));
+        logger.info(format(s));
     }
 
     @Override
     public void warn(String s) {
-        logger.warn(String.format("[%s] %s", plugin.getName(), s));
+        logger.warn(format(s));
     }
 
     @Override
     public void error(String s) {
-        logger.error(String.format("[%s] %s", plugin.getName(), s));
+        logger.error(format(s));
     }
 
     @Override
     public void error(String s, Throwable t) {
-        logger.error(String.format("[%s] %s", plugin.getName(), s), t);
+        logger.error(format(s), t);
+    }
+
+    private String format(String s) {
+        return String.format("[%s] %s", plugin.getName(), s);
     }
 }
