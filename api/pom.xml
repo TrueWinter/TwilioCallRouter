@@ -36,13 +36,10 @@
                 <version>3.4.0</version>
                 <executions>
                     <execution>
-                        <id>attach-javadocs</id>
+                        <phase>package</phase>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>javadoc</goal>
                         </goals>
-                        <configuration>
-                            <outputDirectory>../build/${project.version}/TwilioCallRouter-${project.version}-javadoc</outputDirectory>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
