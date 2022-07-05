@@ -1,5 +1,8 @@
 package dev.truewinter.twiliocallrouter.plugin;
 
+/**
+ * @hidden
+ */
 public class NoopLogger implements Logger {
     NoopLogger() {}
 

@@ -2,6 +2,9 @@ package dev.truewinter.twiliocallrouter.plugin;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @hidden
+ */
 public abstract class PluginBase {
     PluginBase() {}
 
