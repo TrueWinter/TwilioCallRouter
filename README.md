@@ -93,6 +93,10 @@ You will also need to create a SIP domain, configuring it to use a webhook. Set 
 
 Installing TwilioCallRouter behind a reverse proxy, such as Nginx, and configuring SSL is recommended. If using REFERs, please ensure that your proxy passes the protocol to TwilioCallRouter, or enable `refer_force_https`. Also ensure that the correct host header is passed.
 
+## Plugins
+
+TwilioCallRouter supports user-made plugins. See the [api/PLUGINS.md](api/PLUGINS.md) file for more information.
+
 ## Important Information
 
 Due to complexities with extracting E.164 numbers from SIP URIs, calls to certain numbers are currently unsupported.
