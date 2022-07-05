@@ -44,16 +44,7 @@
                             <outputFile>../build/${project.version}/TwilioCallRouter-${project.artifactId}-${project.version}.jar</outputFile>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <shadedArtifactAttached>false</shadedArtifactAttached>
-                            <!-- See comment about SQLite below -->
                             <minimizeJar>true</minimizeJar>
-                            <!-- https://stackoverflow.com/a/47003226 -->
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <manifestEntries>
-                                        <Main-Class>dev.truewinter.twiliocallrouter.TwilioCallRouter</Main-Class>
-                                    </manifestEntries>
-                                </transformer>
-                            </transformers>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>

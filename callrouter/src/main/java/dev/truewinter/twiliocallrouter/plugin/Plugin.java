@@ -1,6 +1,7 @@
 package dev.truewinter.twiliocallrouter.plugin;
 
 import dev.truewinter.twiliocallrouter.TwilioCallRouter;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -8,13 +9,14 @@ import java.io.IOException;
 // will also need to add no-op methods to the Plugin class in the api module.
 // This weird arrangement of classes is required to keep the internal methods
 // hidden from the plugin, while still allowing everything to work well.
-public abstract class Plugin {
+public abstract class Plugin extends PluginBase {
     private String name;
 
     public abstract void onLoad();
     public abstract void onUnload();
 
-    protected void registerListeners(Plugin plugin, Listener listener) {
+    @Override
+    protected void registerListeners(@NotNull Plugin plugin, @NotNull Listener listener) {
         try {
             PluginManager.registerListener(plugin, listener);
         } catch (Exception e) {
@@ -28,10 +30,12 @@ public abstract class Plugin {
         }
     }
 
+    @Override
     protected final Logger getLogger() {
         return new PluginLogger(this);
     }
 
+    @Override
     protected Plugin getPluginByName(String name) throws ClassCastException, IllegalStateException {
         try {
             return PluginManager.getPluginByName(this, name);

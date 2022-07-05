@@ -58,7 +58,6 @@
                             <outputFile>../build/${project.version}/TwilioCallRouter-${project.version}.jar</outputFile>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <shadedArtifactAttached>false</shadedArtifactAttached>
-                            <!-- See comment about SQLite below -->
                             <minimizeJar>true</minimizeJar>
                             <!-- https://stackoverflow.com/a/47003226 -->
                             <transformers>

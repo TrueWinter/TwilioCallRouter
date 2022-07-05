@@ -1,9 +1,7 @@
 package dev.truewinter.twiliocallrouter.plugin;
 
 public class NoopLogger implements Logger {
-    protected NoopLogger() {
-
-    }
+    NoopLogger() {}
 
     @Override
     public void info(String s) {
