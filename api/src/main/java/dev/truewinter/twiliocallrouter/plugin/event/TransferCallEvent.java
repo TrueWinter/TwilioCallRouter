@@ -3,6 +3,9 @@ package dev.truewinter.twiliocallrouter.plugin.event;
 import dev.truewinter.twiliocallrouter.plugin.Event;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * This event is fired before a call is transferred
+ */
 public class TransferCallEvent extends Event {
     private final String transferTo;
     private final String direction;
