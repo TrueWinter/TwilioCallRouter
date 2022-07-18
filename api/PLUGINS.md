@@ -18,7 +18,7 @@ Then, add the API module. It may take a minute or two as the API module is built
     <dependency>
         <groupId>dev.truewinter.TwilioCallRouter</groupId>
         <artifactId>api</artifactId>
-        <version>0.0.9</version>
+        <version>0.0.10</version>
     </dependency>
 </dependencies>
 ```
